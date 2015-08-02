@@ -322,6 +322,13 @@ let
     propagatedBuildInputs = [ crypto ];
   };
 
+  clipboard = buildFromGitHub {
+    rev    = "dfde2702d61cc95071f9def0fe9fc47d43136d6d";
+    owner  = "atotto";
+    repo   = "clipboard";
+    sha256 = "12bx01aj828nmhb5vphv4pwpfl02vndksa82vba5dp7sih5lysqv";
+  };
+
   cli-spinner = buildFromGitHub {
     rev    = "610063bb4aeef25f7645b3e6080456655ec0fb33";
     owner  = "odeke-em";
@@ -882,6 +889,15 @@ let
     owner  = "darkcrux";
     repo   = "gopherduty";
     sha256 = "11w1yqc16fxj5q1y5ha5m99j18fg4p9lyqi542x2xbrmjqqialcf";
+  };
+
+  gopy = buildFromGitHub {
+    rev    = "92b1bf5ab8ad62f8763e3b807a34ff4670254f59";
+    owner  = "limetext";
+    repo   = "gopy";
+    sha256 = "1343kjk1dgnqlzfs2ryx150224p7qchlz35j9c6iqvc3ps26n7wq";
+    buildInputs = [ pkgconfig pkgs.python34 ];
+    subPackages = [ "./lib" ];
   };
 
   gosnappy = buildFromGitHub {
@@ -1505,6 +1521,23 @@ let
     buildInputs = [ pkgs.leveldb ];
   };
 
+  lime-backend = buildFromGitHub {
+    rev    = "4d984c5561887ec0db2744b9fee881a670b9c6c5";
+    owner  = "limetext";
+    repo   = "lime-backend";
+    sha256 = "1l0a5c6j9f1v4bpvsmi7kz0akdkxr2sw7k7sgpc0aslwpnd3qjd3";
+    propagatedBuildInputs = [ log4go clipboard rubex lime-text parser gopy fsnotify.v1 ];
+    subPackages = [ "./lib" ];
+  };
+
+  lime-text = buildFromGitHub {
+    rev    = "d6b8f8c60fe38232a5b59388bbba0f3802c182e9";
+    owner  = "limetext";
+    repo   = "text";
+    sha256 = "13i7km02k5p8m0asz2nbhbxa62hy8mq9kf7ik4mif503zp6fbfya";
+    propagatedBuildInputs = [ log4go ];
+  };
+
   liner = buildFromGitHub {
     rev    = "1bb0d1c1a25ed393d8feb09bab039b2b1b1fbced";
     owner  = "peterh";
@@ -1525,6 +1558,7 @@ let
     goPackagePath = "github.com/ccpaging/log4go";
     goPackageAliases = [
       "github.com/alecthomas/log4go"
+      "github.com/limetext/log4go"
       "code.google.com/p/log4go"
     ];
 
@@ -1773,6 +1807,18 @@ let
       repo = "osext";
       sha256 = "1md9c0qlmfhwcwgqg92vfykcy95snci4n815plb15mgj5cf8dm7d";
     };
+  };
+
+  parser = buildFromGitHub {
+    rev    = "ea90feb37b16642ea83fb2d859dfda981110ce77";
+    owner  = "quarnster";
+    repo   = "parser";
+    sha256 = "1n4zrd6xpkaj8gkmdp1l5a4967i3337l3r92p7babas047b03wnh";
+    preBuild = ''
+      make -C go/src/$goPackagePath xml/xml.go json/json.go plistxml/plistxml.go ini/ini.go expression/expression.go
+    '';
+    propagatedBuildInputs = [ lime-text ];
+    subPackages = [ "./pegparser" ];
   };
 
   pat = buildFromGitHub {
@@ -2056,6 +2102,14 @@ let
     owner  = "odeke-em";
     repo   = "ripper";
     sha256 = "010jsclnmkaywdlyfqdmq372q7kh3qbz2zra0c4wn91qnkmkrnw1";
+  };
+
+  rubex = buildFromGitHub {
+    rev    = "3fc130e580797e3d9c6fdab36e6a961141f9fd5f";
+    owner  = "limetext";
+    repo   = "rubex";
+    sha256 = "1gsdhhw2qn66inab79mvnh7sb8m8s2r1w6kb86gvz596fdyhh0pl";
+    buildInputs = [ pkgconfig pkgs.oniguruma ];
   };
 
   sandblast = buildGoPackage rec {

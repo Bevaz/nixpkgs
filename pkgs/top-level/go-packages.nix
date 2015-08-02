@@ -327,6 +327,10 @@ let
     owner  = "atotto";
     repo   = "clipboard";
     sha256 = "12bx01aj828nmhb5vphv4pwpfl02vndksa82vba5dp7sih5lysqv";
+    postPatch = ''
+      substituteInPlace clipboard_linux.go --replace "xsel  = \"xsel\"" "xsel  = \"${pkgs.xsel}/bin/xsel\""
+    '';
+    buildInputs = [ pkgs.xsel ];
   };
 
   cli-spinner = buildFromGitHub {
@@ -896,6 +900,13 @@ let
     owner  = "limetext";
     repo   = "gopy";
     sha256 = "1343kjk1dgnqlzfs2ryx150224p7qchlz35j9c6iqvc3ps26n7wq";
+    postPatch = ''
+      #substituteInPlace lib/cgo.go --replace "pkg-config"  "${pkgconfig}/bin/pkg-config"
+      substituteInPlace lib/gen_exc.py --replace "/usr/bin/env python"  "${pkgs.python34}/bin/python3"
+      substituteInPlace lib/gen_exc.py --replace "'pkg-config'"  "'${pkgconfig}/bin/pkg-config'"
+      substituteInPlace lib/gen_exc.py --replace "'python3.3-config'"  "'${pkgs.python34}/bin/python3-config'"
+      substituteInPlace lib/gen_exc.py --replace "\"cc\""  "\"${stdenv.cc}/bin/cc\""
+    '';
     buildInputs = [ pkgconfig pkgs.python34 ];
     subPackages = [ "./lib" ];
   };
@@ -1190,6 +1201,9 @@ let
       repo = "go-runewidth";
       sha256 = "07d612val59sibqly5d6znfkp4h4gjd77783jxvmiq6h2fwb964k";
     };
+    goPackageAliases = [
+      "github.com/mattn/go-runewidth"
+    ];
   };
 
   go-shellwords = buildGoPackage rec {
@@ -1527,7 +1541,46 @@ let
     repo   = "lime-backend";
     sha256 = "1l0a5c6j9f1v4bpvsmi7kz0akdkxr2sw7k7sgpc0aslwpnd3qjd3";
     propagatedBuildInputs = [ log4go clipboard rubex lime-text parser gopy fsnotify.v1 ];
-    subPackages = [ "./lib" ];
+    subPackages = [ "./lib" "./lib/commands" "./lib/sublime" ];
+  };
+
+
+  qml.v1 = buildGoPackage rec {
+    rev = "2ee7e5ff737026a4dfa89801fac63561279040f4";
+    name = "qml.v1-${stdenv.lib.strings.substring 0 7 rev}";
+    goPackagePath = "gopkg.in/qml.v1";
+    excludedPackages = "examples";
+
+    src = fetchFromGitHub {
+      inherit rev;
+      owner = "go-qml";
+      repo = "qml";
+      sha256 = "10swjhphww65ifiwylnr5x4i8dx1z511ys0rfglvirqmg1xfd3xq";
+    };
+    goPackageAliases = [
+      "gopkg.in/qml.v1"
+      "github.com/go-qml/qml"
+    ];
+
+    propagatedBuildInputs = [ pkgconfig pkgs.qt5.base pkgs.qt5.quickcontrols ];
+    subPackages = [ "./" "./cdata" "./gl/glbase" ];
+  };
+
+
+  lime-termbox-go = buildGoPackage rec {
+    rev = "4eff9880a72757f9e5997d13741b70ea879d66a8";
+    name = "termbox-go-${stdenv.lib.strings.substring 0 7 rev}";
+    goPackagePath = "github.com/limetext/termbox-go";
+    src = fetchFromGitHub {
+      inherit rev;
+      owner = "limetext";
+      repo = "termbox-go";
+      sha256 = "032qi7m2a09sdh1wkgx7hqnglgl6f8fhr6yzc6b5a65imn7629d4";
+    };
+    postPatch = ''
+      substituteInPlace collect_terminfo.py --replace "/usr/bin/env python"  "${pkgs.python34}/bin/python3"
+    '';
+    propagatedBuildInputs = [ junegunn.go-runewidth pkgs.python34 ];
   };
 
   lime-text = buildFromGitHub {
@@ -1814,10 +1867,13 @@ let
     owner  = "quarnster";
     repo   = "parser";
     sha256 = "1n4zrd6xpkaj8gkmdp1l5a4967i3337l3r92p7babas047b03wnh";
+    postPatch = ''
+      substituteInPlace pygenerator.go --replace "\"python\""  "\"${pkgs.python34}/bin/python3\""
+    '';
     preBuild = ''
       make -C go/src/$goPackagePath xml/xml.go json/json.go plistxml/plistxml.go ini/ini.go expression/expression.go
     '';
-    propagatedBuildInputs = [ lime-text ];
+    propagatedBuildInputs = [ lime-text pkgs.python34 ];
     subPackages = [ "./pegparser" ];
   };
 

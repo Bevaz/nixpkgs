@@ -2125,6 +2125,10 @@ let
 
   limesurvey = callPackage ../servers/limesurvey { };
 
+  limetext-qml = callPackage ../applications/editors/limetext-qml { };
+
+  limetext-termbox = callPackage ../applications/editors/limetext-termbox { };
+
   logcheck = callPackage ../tools/system/logcheck {
     inherit (perlPackages) mimeConstruct;
   };
